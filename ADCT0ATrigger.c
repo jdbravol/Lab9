@@ -68,7 +68,7 @@ void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
-
+uint32_t ADCval = 0;
 // There are many choices to make when using the ADC, and many
 // different combinations of settings will all do basically the
 // same thing.  For simplicity, this function makes some choices
@@ -225,7 +225,7 @@ void WaitForInterrupt(void);  // low power mode
 
 //}
 //Init 1
-void ADC0_InitTimer0ATriggerSeq3PD3(uint32_t period){
+void ADC0_InitTimer0A(uint32_t period){
   volatile uint32_t delay;
   SYSCTL_RCGCADC_R |= 0x01;     // 1) activate ADC0 
   SYSCTL_RCGCGPIO_R |= 0x08;    // Port D clock
@@ -262,6 +262,7 @@ volatile uint32_t ADCvalue;
 void ADC0Seq3_Handler(void){
   ADC0_ISC_R = 0x08;          // acknowledge ADC sequence 3 completion
   ADCvalue = ADC0_SSFIFO3_R;  // 12-bit result
+	ADCval = ADCvalue;
 }
 
 //init 2

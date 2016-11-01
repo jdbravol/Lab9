@@ -21,7 +21,8 @@
  For more information about my classes, my research, and my books, see
  http://users.ece.utexas.edu/~valvano/
  */
-
+ #include <stdint.h>
+extern uint32_t ADCval;
 // This initialization function sets up the ADC according to the
 // following parameters.  Any parameters not explicitly listed
 // below are not modified:
@@ -40,4 +41,4 @@
 // SS3 1st sample source: programmable using variable 'channelNum' [0:11]
 // SS3 interrupts: enabled and promoted to controller
 // channelNum must be 0-11 (inclusive) corresponding to Ain0 through Ain11
-void ADC0_InitTimer0ATriggerSeq3(uint8_t channelNum, uint32_t period);
+void ADC0_InitTimer0A(uint32_t period);

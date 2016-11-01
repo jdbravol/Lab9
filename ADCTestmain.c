@@ -26,9 +26,10 @@
 // bottom of X-ohm potentiometer connected to ground
 // top of X-ohm potentiometer connected to +3.3V through X/10-ohm ohm resistor
 #include <stdint.h>
-#include "../inc/tm4c123gh6pm.h"
+#include "tm4c123gh6pm.h"
 #include "ADCT0ATrigger.h"
 #include "PLL.h"
+#include "UART.h"
 
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
@@ -42,11 +43,12 @@ void WaitForInterrupt(void);  // low power mode
 // result to a global variable that can be accessed with the JTAG
 // debugger and viewed with the variable watch feature.
 
-
+uint32_t measurements[100];
+int count = 0;
 int main(void){
   PLL_Init(Bus80MHz);                      // 80 MHz system clock
   SYSCTL_RCGCGPIO_R |= 0x00000020;         // activate port F
-  ADC0_InitTimer0ATriggerSeq3(0, 8000000); // ADC channel 0, 10 Hz sampling
+  ADC0_InitTimer0A(8000000); // ADC channel 0, 10 Hz sampling
   GPIO_PORTF_DIR_R |= 0x04;                // make PF2 out (built-in LED)
   GPIO_PORTF_AFSEL_R &= ~0x04;             // disable alt funct on PF2
   GPIO_PORTF_DEN_R |= 0x04;                // enable digital I/O on PF2
@@ -55,9 +57,16 @@ int main(void){
   GPIO_PORTF_AMSEL_R = 0;                  // disable analog functionality on PF
   GPIO_PORTF_DATA_R &= ~0x04;              // turn off LED
   EnableInterrupts();
-  while(1){
-    WaitForInterrupt();
+  while(count < 100){
+    if(ADCval != 0) {
+			measurements[count] = ADCval;
+			ADCval = 0;
+			count++;
+		}
     GPIO_PORTF_DATA_R ^= 0x04;             // toggle LED
   }
+	for (int i = 0; i < 100; i++) {
+		UART_OutUDec(measurements[i]);
+	}
 }
 
