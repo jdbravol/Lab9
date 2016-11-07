@@ -48,7 +48,7 @@ int count = 0;
 int main(void){
   PLL_Init(Bus80MHz);                      // 80 MHz system clock
   SYSCTL_RCGCGPIO_R |= 0x00000020;         // activate port F
-  ADC0_InitTimer0A(8000000); // ADC channel 0, 10 Hz sampling
+  ADC0_InitTimer0A(80000); 								 // ADC  1000 Hz sampling
   GPIO_PORTF_DIR_R |= 0x04;                // make PF2 out (built-in LED)
   GPIO_PORTF_AFSEL_R &= ~0x04;             // disable alt funct on PF2
   GPIO_PORTF_DEN_R |= 0x04;                // enable digital I/O on PF2
