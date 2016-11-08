@@ -22,6 +22,7 @@
  http://users.ece.utexas.edu/~valvano/
  */
 #include <stdint.h>
+#include "Fixed.h"
 #include "tm4c123gh6pm.h"
 #define NVIC_EN0_INT17          0x00020000  // Interrupt 17 enable
 
@@ -262,7 +263,9 @@ volatile uint32_t ADCvalue;
 void ADC0Seq3_Handler(void){
   ADC0_ISC_R = 0x08;          // acknowledge ADC sequence 3 completion
   ADCvalue = ADC0_SSFIFO3_R;  // 12-bit result
-	ADCval = ADCvalue;
+	addPoint(getTemp(ADCvalue));
+	ST7735_PlotArray();
+	//ST7735_PlotNewPoint(plotVal);
 }
 
 //init 2

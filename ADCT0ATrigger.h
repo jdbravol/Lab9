@@ -23,6 +23,7 @@
  */
  #include <stdint.h>
 extern uint32_t ADCval;
+extern double plotVal;
 // This initialization function sets up the ADC according to the
 // following parameters.  Any parameters not explicitly listed
 // below are not modified:
