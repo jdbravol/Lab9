@@ -33,7 +33,7 @@
 #include "UART.h"
 #include "Fixed.h"
 //#define TESTGRAPH
-#define TESTUART
+//#define TESTUART
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts

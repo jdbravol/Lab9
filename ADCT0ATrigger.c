@@ -265,11 +265,10 @@ void ADC0Seq3_Handler(void){
   ADC0_ISC_R = 0x08;          // acknowledge ADC sequence 3 completion
   ADCvalue = ADC0_SSFIFO3_R;  // 12-bit result
 	ADCval = ADCvalue;
-//	int temp = getTemp(ADCvalue);
-//	outputTemp(temp);
-//	addPoint(temp);
-//	ST7735_PlotArray();
-	//ST7735_PlotNewPoint(plotVal);
+	int temp = getTemp(ADCvalue);
+	outputTemp(temp);
+	addPoint(temp);
+	ST7735_PlotArray();
 }
 
 //init 2
