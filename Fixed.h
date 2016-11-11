@@ -101,9 +101,11 @@ void ST7735_LineGraphInit(int height, int width);
 
 void ST7735_PlotNewPoint(int val);
 
-void addPoint(double val);
+void addPoint(float val);
 
 void ST7735_PlotArray(void);
 
 //R = Roe^(B/T) Solves for T
-double getTemp(int adcVal);
+float getTemp(int adcVal);
+
+void outputTemp(int val);

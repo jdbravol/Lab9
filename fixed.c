@@ -220,7 +220,7 @@ void ST7735_ClockInit(uint32_t hours, uint32_t minutes) {
 	ST7735_Line(xCenter, yCenter, xMinute, yMinute, ST7735_GREEN);
 	ST7735_Line(xCenter, yCenter, (xHour*3/4), (yHour*3/4), ST7735_GREEN);
 }
-int gHeight;
+float gHeight;
 int gWidth;
 void ST7735_LineGraphInit(int height, int width) {
 	ST7735_InitR(INITR_REDTAB);
@@ -247,7 +247,7 @@ int x = 13;
 void ST7735_PlotNewPoint(int val) {
 	ST7735_DrawFastVLine(x, 10, gHeight-5, ST7735_BLACK);
 	ST7735_DrawFastVLine(x + 1, 10, gHeight-5, ST7735_BLACK);
-	val = (val*(gHeight/40)) + 10;
+	val = (val*(gHeight/4000)) + 10;
 	ST7735_DrawPixel(x, val, ST7735_BLUE);
 	ST7735_DrawPixel(x + 1, val, ST7735_BLUE);
 	ST7735_DrawPixel(x, val + 1, ST7735_BLUE);
@@ -261,7 +261,7 @@ void ST7735_PlotNewPoint(int val) {
 }
 double vals[26];
 int i = 0;
-void addPoint(double val) {
+void addPoint(float val) {
 	vals[i] = val;
 	i += 1;
 	i%=26;
@@ -272,7 +272,9 @@ void ST7735_PlotArray(void) {
 	while (x < gWidth + 13) {
 		ST7735_DrawFastVLine(x, 10, gHeight-5, ST7735_BLACK);
 		ST7735_DrawFastVLine(x + 1, 10, gHeight-5, ST7735_BLACK);
-		int val = ((40 - vals[j])*((gHeight*.75)/30)) + 10;
+		float ratio = gHeight/4000;
+		float flipped = 4000 - vals[j];
+		int val = (int)(flipped*ratio) + 10;
 		ST7735_DrawPixel(x, val, ST7735_BLUE);
 		ST7735_DrawPixel(x + 1, val, ST7735_BLUE);
 		ST7735_DrawPixel(x, val + 1, ST7735_BLUE);
@@ -284,115 +286,54 @@ void ST7735_PlotArray(void) {
 	x = 13;
 }
 
-int adcVals[53] = {4096, 3207,
-3112,
-3019,
-2927,
-2837,
-2748,
-2661,
-2576,
-2491,
-2409,
-2328,
-2248,
-2169,
-2093,
-2017,
-1943,
-1871,
-1799,
-1730,
-1661,
-1594,
-1528,
-1464,
-1401,
-1339,
-1278,
-1219,
-1160,
-1104,
-1048,
-993,
-940,
-887,
-836,
-786,
-737,
-689,
-642,
-596,
-551,
-508,
-465,
-423,
-381,
-341,
-302,
-264,
-226,
-189,
-153,
-118,
-0};
+uint16_t const ADCdata[53]={0,13,58,103,149,197,245,295,346,398,452,
+     506,562,619,677,737,798,861,925,990,1057,
+     1125,1195,1266,1339,1414,1490,1568,1648,1729,1812,
+     1897,1983,2072,2162,2254,2348,2444,2542,2641,2743,
+     2847,2952,3060,3170,3282,3395,3511,3629,3749,3871,3995,4096};
 
-double temps[51] = {10,
-10.6,
-11.2,
-11.8,
-12.4,
-13.0,
-13.6,
-14.2,
-14.8,
-15.4,
-16.0,
-16.6,
-17.2,
-17.8,
-18.4,
-19.0,
-19.6,
-20.2,
-20.8,
-21.4,
-22.0,
-22.6,
-23.2,
-23.8,
-24.4,
-25.0,
-25.6,
-26.2,
-26.8,
-27.4,
-28.0,
-28.6,
-29.2,
-29.8,
-30.4,
-31.0,
-31.6,
-32.2,
-32.8,
-33.4,
-34.0,
-34.6,
-35.2,
-35.8,
-36.4,
-37.0,
-37.6,
-38.2,
-38.8,
-39.4,
-40};
-double getTemp(int adcVal) {
+uint16_t const Tdata[53]={4000,4000,3940,3880,3820,3760,3700,3640,3580,3520,3460,
+     3400,3340,3280,3220,3160,3100,3040,2980,2920,2860,
+     2800,2740,2680,2620,2560,2500,2440,2380,2320,2260,
+     2200,2140,2080,2020,1960,1900,1840,1780,1720,1660,
+     1600,1540,1480,1420,1360,1300,1240,1180,1120,1060,1000,1000};
+
+uint16_t const Rdata[53]={5052,5052,5175,5302,5433,5567,5706,5848,5995,6145,6300,	
+     6460,6624,6794,6968,7147,7332,7522,7718,7920,8128,	
+     8342,8563,8791,9026,9268,9517,9774,10039,10313,10595,	
+     10886,11186,11496,11816,12146,12486,12838,13201,13576,13963,	
+     14363,14776,15202,15643,16099,16570,17056,17560,18080,18618,19174,19174};	
+
+
+
+int solveTemp(int i, int adc) {
+	float x1 = ADCdata[i];
+	float y1 = Tdata[i];
+	float x2 = ADCdata[i+1];
+	float y2 = Tdata[i+1];
+	float slope = (y2 - y1)/(x2 - x1);
+	float offset = y1 - (slope * x1);
+	int temp = (int)((slope * adc) + offset);
+	return temp;
+}
+		 
+float getTemp(int adcVal) {
 	for (int i = 0; i < 52; i++) {
-		if (adcVals[i] >= adcVal && adcVals[i+1] <= adcVal) {
-			return temps[i];
+		if (ADCdata[i] <= adcVal && ADCdata[i+1] >= adcVal) {
+			return solveTemp(i, adcVal);
 		}
 	}
 	return 0;
+}
+void outputTemp(int val) {
+	ST7735_SetCursor(15,0);
+	int n = val;
+	ST7735_OutChar(n/1000 + 0x30);		
+	n%=1000;					
+	ST7735_OutChar(n/100 + 0x30);		
+	n%=100;
+	ST7735_OutChar('.');
+	ST7735_OutChar(n/10 + 0x30);		
+	n%=10;
+	ST7735_OutChar(n + 0x30);	
 }
